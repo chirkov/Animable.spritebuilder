@@ -7,22 +7,41 @@
 //
 
 #import "Gameplay.h"
+#import "CCPhysics+ObjectiveChipmunk.h"
+#include "stdlib.h"
+#define ARC4RANDOM_MAX 0x100000000
 
 @implementation Gameplay {
     CCPhysicsNode *_physicsNode;
+    CGPoint bubbleVelocity;
+    CGPoint bubbleForce;
+    CCNode* bubbles[5];
+    float randSize;
+    float randX;
+    float randY;
+    float randPositionX;
+    float randPositionY;
 }
 
 - (void)didLoadFromCCB {
     self.userInteractionEnabled = TRUE;
+    _physicsNode.debugDraw = FALSE;
     
-    CCNode* bubble = [CCBReader load:@"Bubble"];
-    bubble.position = ccp(0, 0);
-    
-    [_physicsNode addChild:bubble];
-    
-    CGPoint launchDirection = ccp(1, 1);
-    CGPoint force = ccpMult(launchDirection, 80000);
-    [bubble.physicsBody applyForce:force];
+    for (int i = 0; i < 5; i++) {
+        randSize = ((float)arc4random() / ARC4RANDOM_MAX)/2;
+        randX = ((double)arc4random() / ARC4RANDOM_MAX);
+        randY = ((double)arc4random() / ARC4RANDOM_MAX);
+        randPositionX = ((double)arc4random() / ARC4RANDOM_MAX)*100;
+        randPositionY = ((double)arc4random() / ARC4RANDOM_MAX)*100;
+        NSLog(@"%d", arc4random() % 100);
+        bubbles[i] = [CCBReader load:@"Bubble"];
+        bubbles[i].position = ccp(randPositionX, randPositionY);
+        bubbles[i].scale = randSize;
+        [_physicsNode addChild:bubbles[i]];
+        CGPoint launchDirection = ccp(randX, randY);
+        CGPoint force = ccpMult(launchDirection, 1000);
+        [bubbles[i].physicsBody applyForce:force];
+    }
 }
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
@@ -31,6 +50,15 @@
 
 - (void)bubbleInteration {
     CCLOG(@"Bubble touched");
+    
+}
+
+- (void)update:(CCTime)delta {
+    for (int i = 0; i < 5; i++) {
+        bubbleVelocity = bubbles[i].physicsBody.velocity;
+        bubbleForce = ccpMult(bubbleVelocity, 0.5);
+        [bubbles[i].physicsBody applyForce:bubbleForce];
+    }
     
 }
 
