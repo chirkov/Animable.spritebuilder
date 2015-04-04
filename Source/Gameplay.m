@@ -33,8 +33,8 @@
         randSize = ((float)arc4random() / ARC4RANDOM_MAX) / 4 + 0.25f;
         randX = ((double)arc4random() / ARC4RANDOM_MAX) * 2 - 1;
         randY = ((double)arc4random() / ARC4RANDOM_MAX) * 2 - 1;
-        randPositionX = ((double)arc4random() / ARC4RANDOM_MAX) * 200 - 100;
-        randPositionY = ((double)arc4random() / ARC4RANDOM_MAX) * 200 - 100;
+        randPositionX = ((double)arc4random() / ARC4RANDOM_MAX) * 400 + 50;
+        randPositionY = ((double)arc4random() / ARC4RANDOM_MAX) * 200 + 50;
         bubbles[i] = [CCBReader load:@"Bubble"];
         bubbles[i].position = ccp(randPositionX, randPositionY);
         bubbles[i].scale = randSize;
@@ -42,18 +42,26 @@
         CGPoint launchDirection = ccp(randX, randY);
         CGPoint force = ccpMult(launchDirection, 1000);
         [bubbles[i].physicsBody applyForce:force];
-        NSLog(@"%f", bubbles[i].scale);
         isGrow[i] = TRUE;
     }
 }
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
-    //[self bubbleInteration];
-    [touch ]
+    for (int i = 0; i < 5; i++) {
+        bool isTouch = CGRectContainsPoint(bubbles[i].boundingBox, touch.locationInWorld);
+        if (isTouch) {
+            [self bubbleInteration:i];
+        }
+    }
 }
 
-- (void)bubbleInteration {
-    //CCLOG(@"Bubble touched");
+- (void)bubbleInteration:(int)number {
+    NSLog(@"%d", number);
+    CCParticleSystem *effect = (CCParticleSystem *)[CCBReader load:@"Effect"];
+    effect.autoRemoveOnFinish = TRUE;
+    effect.position = bubbles[number].position;
+    [bubbles[number].physicsBody setVelocity:ccp(0.0f, 0.0f)];
+    [self addChild:effect];
 }
 
 
