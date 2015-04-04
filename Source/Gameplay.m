@@ -21,6 +21,8 @@
     float randY;
     float randPositionX;
     float randPositionY;
+    float changeSize;
+    bool isGrow[5];
 }
 
 - (void)didLoadFromCCB {
@@ -28,12 +30,11 @@
     _physicsNode.debugDraw = FALSE;
     
     for (int i = 0; i < 5; i++) {
-        randSize = ((float)arc4random() / ARC4RANDOM_MAX)/2;
-        randX = ((double)arc4random() / ARC4RANDOM_MAX);
-        randY = ((double)arc4random() / ARC4RANDOM_MAX);
-        randPositionX = ((double)arc4random() / ARC4RANDOM_MAX)*100;
-        randPositionY = ((double)arc4random() / ARC4RANDOM_MAX)*100;
-        NSLog(@"%d", arc4random() % 100);
+        randSize = ((float)arc4random() / ARC4RANDOM_MAX) / 4 + 0.25f;
+        randX = ((double)arc4random() / ARC4RANDOM_MAX) * 2 - 1;
+        randY = ((double)arc4random() / ARC4RANDOM_MAX) * 2 - 1;
+        randPositionX = ((double)arc4random() / ARC4RANDOM_MAX) * 200 - 100;
+        randPositionY = ((double)arc4random() / ARC4RANDOM_MAX) * 200 - 100;
         bubbles[i] = [CCBReader load:@"Bubble"];
         bubbles[i].position = ccp(randPositionX, randPositionY);
         bubbles[i].scale = randSize;
@@ -41,25 +42,42 @@
         CGPoint launchDirection = ccp(randX, randY);
         CGPoint force = ccpMult(launchDirection, 1000);
         [bubbles[i].physicsBody applyForce:force];
+        NSLog(@"%f", bubbles[i].scale);
+        isGrow[i] = TRUE;
     }
 }
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
-    [self bubbleInteration];
+    //[self bubbleInteration];
+    [touch ]
 }
 
 - (void)bubbleInteration {
-    CCLOG(@"Bubble touched");
-    
+    //CCLOG(@"Bubble touched");
 }
+
 
 - (void)update:(CCTime)delta {
     for (int i = 0; i < 5; i++) {
+        if (isGrow[i]) {
+            changeSize = bubbles[i].scale + 1.0f;
+        } else {
+            changeSize = bubbles[i].scale - 1.0f;
+        }
+        if (isGrow[i] && bubbles[i].scale > 0.5f) {
+            isGrow[i] = FALSE;
+        }
+        if (!isGrow[i] && bubbles[i].scale < 0.25f) {
+            isGrow[i] = TRUE;
+        }
+        changeSize = bubbles[i].scale;
         bubbleVelocity = bubbles[i].physicsBody.velocity;
         bubbleForce = ccpMult(bubbleVelocity, 0.5);
         [bubbles[i].physicsBody applyForce:bubbleForce];
+        [bubbles[i] setScale:changeSize];
     }
     
 }
+
 
 @end
