@@ -62,6 +62,11 @@
     effect.position = bubbles[number].position;
     [bubbles[number].physicsBody setVelocity:ccp(0.0f, 0.0f)];
     [self addChild:effect];
+    //CCScene *gameplayScene = [CCBReader loadAsScene:@"AnimaleScene"];
+    //[[CCDirector sharedDirector] replaceScene:gameplayScene];
+    NSString* myScene = [@"Scenes/Scene" stringByAppendingString:[NSString stringWithFormat:@"%i", number]];
+    CCNode *animaleScene = [CCBReader load:myScene];
+    [self addChild:animaleScene];
 }
 
 
